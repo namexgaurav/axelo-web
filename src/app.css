@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #FFFFFF;
+    color: #111111;
+  }
+
+  ::selection {
+    background-color: #0052FF;
+    color: #FFFFFF;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F7F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1D1CB;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999994;
+}
+
+/* Editorial typography and utility effects */
+.editorial-title {
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+
+.eyebrow-text {
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Image reveal / masking effect */
+.reveal-mask {
+  position: relative;
+  overflow: hidden;
+}
+
+.reveal-mask::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #F7F7F5;
+  transform-origin: bottom;
+  transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+  pointer-events: none;
+}
+
+.reveal-mask.is-revealed::after {
+  transform: scaleY(0);
+}
+
+/* Subtle image scale hover */
+.img-zoom-hover {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .img-zoom-hover {
+  transform: scale(1.035);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
