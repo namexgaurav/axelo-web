@@ -1,33 +1,26 @@
 <script lang="ts">
-  import { X, ArrowRight, ShoppingBag } from 'lucide-svelte';
+  import { X, ArrowRight, ShoppingBag, User as UserIcon } from 'lucide-svelte';
   import { cartDrawerOpen, cartCount } from '../../stores/cart';
+  import { isAuthenticated } from '$lib/auth/auth.store';
 
   export let isOpen = false;
   export let onClose: () => void = () => {};
 
   const links = [
-    { label: 'Shop Catalog', href: '#products', count: '06 Items' },
-    { label: 'Desk Mats & Pads', href: '#category-desk-mats', count: 'Pro & Core' },
-    { label: 'Mechanical Keyboards', href: '#category-keyboards', count: 'Apex 75' },
-    { label: 'Precision Mice', href: '#category-mice', count: 'Contour 58g' },
-    { label: 'Desk Organization', href: '#products', count: 'Shelves & Docks' },
-    { label: 'Design Philosophy', href: '#philosophy', count: 'Manifesto' },
-    { label: 'Editorial Stories', href: '#stories', count: 'Read' }
+    { label: 'All Collections & Store', href: '/collections', count: 'Archive' },
+    { label: 'Desk Mats & Pads', href: '/collections/desk-mats', count: '06 Pieces' },
+    { label: 'Mechanical Keyboards', href: '/collections/keyboards', count: 'Apex 75' },
+    { label: 'Precision Mice', href: '/collections/mice', count: 'Contour 58g' },
+    { label: 'Desk Organization', href: '/collections/organization', count: 'Risers & Docks' },
+    { label: 'Design Philosophy', href: '/philosophy', count: 'Manifesto' },
+    { label: 'Editorial Stories', href: '/stories', count: 'Journal' }
   ];
-
-  function handleNavigate(href: string) {
-    onClose();
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
 </script>
 
 {#if isOpen}
   <!-- Overlay Backdrop -->
   <div
-    class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity"
+    class="fixed inset-0 z-50 bg-black/50 backdrop-blur-md transition-opacity"
     on:click={onClose}
     role="button"
     tabindex="0"
@@ -36,34 +29,37 @@
 
   <!-- Drawer Menu -->
   <div
-    class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-2xl flex flex-col p-6 sm:p-8 animate-fade-in"
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white border-l border-black/[0.08] shadow-2xl flex flex-col p-6 sm:p-8 animate-fade-in sm:rounded-l-3xl"
   >
-    <div class="flex items-center justify-between pb-6 border-b border-axelo-border">
-      <div class="flex items-center gap-2">
-        <div class="w-6 h-6 bg-axelo-dark rounded flex items-center justify-center">
-          <span class="text-white text-xs font-bold font-mono">A</span>
+    <div class="flex items-center justify-between pb-6 border-b border-black/[0.06]">
+      <div class="flex items-center gap-2.5">
+        <div class="w-7 h-7 bg-axelo-dark rounded-lg flex items-center justify-center shadow-sm">
+          <span class="text-white text-xs font-bold font-mono tracking-tighter">AX</span>
         </div>
-        <span class="font-bold tracking-tight text-sm uppercase">AXELO NAVIGATION</span>
+        <span class="font-mono text-xs uppercase tracking-widest text-axelo-muted">Index / Navigation</span>
       </div>
       <button
         type="button"
         on:click={onClose}
-        class="p-2 text-axelo-muted hover:text-axelo-dark rounded-full hover:bg-axelo-neutral"
+        class="w-8 h-8 flex items-center justify-center text-axelo-muted hover:text-axelo-dark rounded-full hover:bg-black/[0.04] transition-colors"
         aria-label="Close menu"
       >
-        <X class="w-5 h-5" />
+        <X class="w-4 h-4" />
       </button>
     </div>
 
     <!-- Navigation List -->
-    <div class="flex-1 py-8 flex flex-col justify-start space-y-4 overflow-y-auto">
-      {#each links as link}
+    <div class="flex-1 py-8 flex flex-col justify-start space-y-1 overflow-y-auto">
+      {#each links as link, i}
         <a
           href={link.href}
-          on:click|preventDefault={() => handleNavigate(link.href)}
-          class="flex items-center justify-between py-2 text-lg font-medium text-axelo-dark hover:text-axelo-blue transition-colors group"
+          on:click={onClose}
+          class="flex items-center justify-between py-3 px-3 rounded-xl text-base font-medium text-axelo-dark hover:bg-black/[0.03] hover:text-axelo-blue transition-all group"
         >
-          <span>{link.label}</span>
+          <div class="flex items-center gap-3">
+            <span class="font-mono text-[11px] text-axelo-muted group-hover:text-axelo-blue">0{i + 1}</span>
+            <span class="tracking-tight">{link.label}</span>
+          </div>
           <div class="flex items-center gap-2 text-xs font-mono text-axelo-muted group-hover:text-axelo-blue">
             <span>{link.count}</span>
             <ArrowRight class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
@@ -73,20 +69,40 @@
     </div>
 
     <!-- Bottom Actions -->
-    <div class="pt-6 border-t border-axelo-border space-y-3">
+    <div class="pt-6 border-t border-black/[0.06] space-y-3">
+      {#if $isAuthenticated}
+        <a
+          href="/account"
+          on:click={onClose}
+          class="w-full flex items-center justify-center gap-2 py-3 bg-white border border-black/10 text-axelo-dark rounded-xl text-sm font-medium hover:bg-axelo-neutral transition-colors shadow-xs"
+        >
+          <UserIcon class="w-4 h-4 text-axelo-blue" />
+          <span>My Account & Orders</span>
+        </a>
+      {:else}
+        <a
+          href="/login"
+          on:click={onClose}
+          class="w-full flex items-center justify-center gap-2 py-3 bg-white border border-black/10 text-axelo-dark rounded-xl text-sm font-medium hover:bg-axelo-neutral transition-colors shadow-xs"
+        >
+          <UserIcon class="w-4 h-4 text-axelo-muted" />
+          <span>Sign In / Create Account</span>
+        </a>
+      {/if}
+
       <button
         type="button"
         on:click={() => {
           onClose();
           cartDrawerOpen.set(true);
         }}
-        class="w-full flex items-center justify-center gap-2 py-3 bg-axelo-dark text-white rounded-lg text-sm font-medium hover:bg-axelo-blue transition-colors"
+        class="w-full flex items-center justify-center gap-2 py-3.5 bg-axelo-dark text-white rounded-xl text-sm font-medium hover:bg-axelo-blue transition-colors shadow-sm"
       >
         <ShoppingBag class="w-4 h-4" />
         <span>View Shopping Bag ({$cartCount})</span>
       </button>
-      <div class="text-center text-[11px] text-axelo-muted">
-        AXELO — DEFINE YOUR OWN POWER
+      <div class="text-center font-mono text-[10px] uppercase tracking-wider text-axelo-muted pt-1">
+        AXELO — Engineered Workspace Hardware
       </div>
     </div>
   </div>
