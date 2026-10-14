@@ -1,8 +1,91 @@
-node_modules
-dist
-.DS_Store
-.svelte-kit
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cloudflare & Wrangler local state
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# Supabase local development state
+supabase/.temp/
+supabase/.branches/
+.supabase/
+
+# Build & output directories
+dist/
+build/
+.svelte-kit/
+.output/
+.vite/
+.cache/
+.turbo/
+
+# Environment & secret files
 .env
 .env.*
 !.env.example
+*.local
+*.pem
+*.key
+*.cert
+*.crt
+credentials.json
+service-account*.json
 
+# Playwright & End-to-End testing
+playwright.config.ts
+playwright.config.*
+tests/
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+playwright/.cache/
+coverage/
+
+# Admin documentation & local guides
+admin-supabase-use.md
+admin-supabse*
+admin-*.md
+
+# Local agent scratch & test skills
+.agents/scratch/
+.agents/skills/playwright-skill/
+.agents/skills/javascript-testing-patterns/
+.agents/skills/test-driven-development/
+.agents/skills/test-fixing/
+
+# Local notes & temporary scratchpads
+*-notes.md
+*.scratch
+scratch/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Operating system files
+.DS_Store
+**/.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+.Spotlight-V100
+.Trashes
+
+# Editor / IDE configuration
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~

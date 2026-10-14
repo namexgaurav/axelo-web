@@ -257,10 +257,11 @@
         {#if showFiltersDrawer}
           <div class="mt-4 pt-4 border-t border-black/[0.06] grid grid-cols-1 sm:grid-cols-3 gap-6 animate-fade-in text-xs">
             <div>
-              <label class="block font-mono text-[11px] uppercase tracking-wider text-axelo-muted font-bold mb-2">
+              <label for="priceCapFilter" class="block font-mono text-[11px] uppercase tracking-wider text-axelo-muted font-bold mb-2">
                 Price Cap: ${maxPrice}
               </label>
               <input
+                id="priceCapFilter"
                 type="range"
                 min="50"
                 max="300"
@@ -268,6 +269,7 @@
                 bind:value={maxPrice}
                 class="w-full accent-axelo-blue cursor-pointer"
               />
+
               <div class="flex justify-between text-[10px] font-mono text-axelo-muted mt-1">
                 <span>$50</span>
                 <span>$300</span>

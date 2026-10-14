@@ -30,8 +30,9 @@
     });
   } else {
     clearAuthState();
-    cart.set([]);
+    cart.reset();
   }
+
 
   onMount(() => {
     const { data: authData } = supabase.auth.onAuthStateChange(async (event, newSession) => {

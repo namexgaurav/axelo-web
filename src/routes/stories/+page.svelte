@@ -178,16 +178,16 @@
 {#if selectedStory}
   <div
     class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fade-in"
-    on:click={() => (selectedStory = null)}
+    on:click={(e) => { if (e.target === e.currentTarget) selectedStory = null; }}
     role="button"
     tabindex="0"
     on:keydown={(e) => e.key === 'Escape' && (selectedStory = null)}
   >
     <div
       class="bg-white max-w-2xl w-full max-h-[85vh] rounded-3xl p-6 sm:p-10 shadow-2xl overflow-y-auto border border-black/10 relative"
-      on:click|stopPropagation
       role="document"
     >
+
       <button
         type="button"
         on:click={() => (selectedStory = null)}

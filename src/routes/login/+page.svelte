@@ -3,6 +3,7 @@
   import { page } from '$app/state';
   import { onDestroy } from 'svelte';
   import { sendEmailOtp, sendPhoneOtp, verifyEmailOtp, verifyPhoneOtp } from '$lib/auth/auth.service';
+  import { getSafeRedirectUrl } from '$lib/utils/url';
   import { Mail, Phone, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-svelte';
 
   export let data;
@@ -25,7 +26,7 @@
   let resendTimer: NodeJS.Timeout | null = null;
 
   $: supabase = page.data.supabase;
-  $: redirectTo = data?.redirectTo || '/account';
+  $: redirectTo = getSafeRedirectUrl(data?.redirectTo, '/account');
 
   const countryCodes = [
     { code: '+91', country: 'IN', label: 'India (+91)' },
@@ -214,7 +215,7 @@
         </button>
       </div>
 
-      <form on:submit|preventDefault={handleSendOtp} class="space-y-4">
+      <form on:submit|preventDefault={handleSendOtp} novalidate class="space-y-4">
         {#if mode === 'email'}
           <div>
             <label for="email" class="block text-xs font-mono uppercase tracking-wider text-axelo-muted mb-1.5">

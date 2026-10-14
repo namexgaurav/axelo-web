@@ -7,6 +7,18 @@
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
     },
+    "javascript-testing-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/javascript-typescript/skills/javascript-testing-patterns/SKILL.md",
+      "computedHash": "8d0a8d7615ff343770af0218720691d56c55ae258793565936c8b3a97e188f51"
+    },
+    "playwright-skill": {
+      "source": "lackeyjb/playwright-skill",
+      "sourceType": "github",
+      "skillPath": "skills/playwright-skill/SKILL.md",
+      "computedHash": "813e921d157dccfeff1b2f60dd0cdb1fe7dd02c77c2762cb7dd320dae17fc562"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
@@ -18,6 +30,19 @@
       "sourceType": "github",
       "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
       "computedHash": "e14e276241805c97dbcfe40dcbea1a3035269cc7293cac4b1832dda41a835e60"
+    },
+    "test-driven-development": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "computedHash": "3cfe4ebb6fa7288f668d87880d279c8e48f7a92b63415e296857060f5ce22e05"
+    },
+    "test-fixing": {
+      "source": "opmat/antigravity-awesome-skills",
+      "ref": "main",
+      "sourceType": "github",
+      "skillPath": "plugins/antigravity-bundle-qa-testing/skills/test-fixing/SKILL.md",
+      "computedHash": "d478821a82e73a39e2d5150e42fea982af1bfd53716614f8c5622581780edaa8"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",

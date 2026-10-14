@@ -26,9 +26,10 @@ declare global {
 	}
 }
 
-declare module '$env/static/public' {
+declare module '$app/env/public' {
 	export const PUBLIC_SUPABASE_URL: string;
 	export const PUBLIC_SUPABASE_ANON_KEY: string;
 }
+
 
 export {};

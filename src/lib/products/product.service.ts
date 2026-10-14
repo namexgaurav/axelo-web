@@ -85,9 +85,14 @@ export async function fetchProductBySlug(
 	supabase: SupabaseClient<Database, any, any> | undefined,
 	idOrSlug: string
 ): Promise<Product | null> {
+	if (!idOrSlug || !/^[a-zA-Z0-9_-]+$/.test(idOrSlug)) {
+		return null;
+	}
+
 	if (!supabase) {
 		return staticProducts.find((p) => p.id === idOrSlug) || null;
 	}
+
 
 	try {
 		const { data, error } = await supabase

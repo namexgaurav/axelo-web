@@ -3,8 +3,9 @@
   import { categories } from '../../data/products';
   import { reveal } from '../../animations/reveal';
 
-  export let onSelectCategory: (categoryId: string) => void = () => {};
+  export const onSelectCategory = (_categoryId: string) => {};
 </script>
+
 
 <section id="categories" class="py-28 md:py-40 bg-[#F7F7F5] border-y border-axelo-border/70">
   <div class="max-w-7xl mx-auto px-5 sm:px-8">

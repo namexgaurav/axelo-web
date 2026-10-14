@@ -153,9 +153,18 @@ function createCartStore() {
           console.error('Failed to clear DB cart:', err);
         }
       }
+    },
+
+    /**
+     * Reset local cart state and active cart ID on logout
+     */
+    reset: () => {
+      activeCartId = null;
+      set([]);
     }
   };
 }
+
 
 export const cart = createCartStore();
 
