@@ -10,5 +10,11 @@ export const variables = defineEnvVars({
 		public: true,
 		static: true,
 		schema: (val) => val || 'placeholder-anon-key'
+	},
+	SUPABASE_SERVICE_ROLE_KEY: {
+		public: false,
+		static: false,
+		schema: (val) => (val && val.trim().length > 0 ? val.trim() : undefined),
+		description: 'Optional server-only key used strictly by /api/contact to persist contact_messages.'
 	}
 });

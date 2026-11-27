@@ -1,11 +1,11 @@
 import type { LayoutServerLoad } from './$types';
+import { getGlobalSiteData } from '$lib/services/site.service';
 
-export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
-	const { session, user } = await safeGetSession();
+export const load: LayoutServerLoad = async ({ locals: { supabase }, url }) => {
+	const site = await getGlobalSiteData(supabase);
 
 	return {
-		session,
-		user,
-		cookies: cookies.getAll()
+		site,
+		origin: url.origin
 	};
 };

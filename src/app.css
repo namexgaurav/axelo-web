@@ -14,121 +14,71 @@
 
   body {
     background-color: #FFFFFF;
-    color: #111111;
+    color: #0D1014;
   }
 
   ::selection {
-    background-color: #0052FF;
+    background-color: #0066FF;
     color: #FFFFFF;
+  }
+
+  :focus-visible {
+    outline: 2px solid #0066FF;
+    outline-offset: 2px;
   }
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F7F7F5;
+  background: #F4F5F7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D5D5CF;
+  background: #D5D9E0;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #999994;
+  background: #98A2B3;
 }
 
-/* Editorial typography and utility effects */
 .editorial-title {
-  letter-spacing: -0.04em;
-  line-height: 0.98;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 .eyebrow-text {
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
 }
 
-/* Hotspot pulsing marker */
-.hotspot-pin {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Restrained futuristic architectural dot grid */
+.axelo-grid-bg {
+  background-image: radial-gradient(rgba(13, 16, 20, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-.hotspot-pin::before {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: 9999px;
-  background: rgba(0, 82, 255, 0.25);
-  animation: hotspotPulse 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+/* Subtle futuristic precision hairline */
+.axelo-hairline-gradient {
+  background: linear-gradient(90deg, rgba(0, 102, 255, 0) 0%, rgba(0, 102, 255, 0.45) 50%, rgba(0, 102, 255, 0) 100%);
 }
 
-@keyframes hotspotPulse {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scale(1.6);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(0.6);
-    opacity: 0;
-  }
-}
-
-/* Waveform sound bar animations */
-@keyframes waveBounce {
-  0%, 100% {
-    transform: scaleY(0.2);
-  }
-  50% {
-    transform: scaleY(1);
-  }
-}
-
-.waveform-bar-1 { animation: waveBounce 0.8s ease-in-out infinite; }
-.waveform-bar-2 { animation: waveBounce 0.6s ease-in-out infinite 0.15s; }
-.waveform-bar-3 { animation: waveBounce 0.9s ease-in-out infinite 0.3s; }
-.waveform-bar-4 { animation: waveBounce 0.7s ease-in-out infinite 0.1s; }
-.waveform-bar-5 { animation: waveBounce 0.85s ease-in-out infinite 0.25s; }
-
-/* Image zoom on hover */
 .img-zoom-hover {
-  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .group:hover .img-zoom-hover {
-  transform: scale(1.038);
+  transform: scale(1.035);
 }
 
-/* Hairline glass surface */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.glass-panel-dark {
-  background: rgba(17, 17, 17, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -137,5 +87,9 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .group:hover .img-zoom-hover {
+    transform: none;
   }
 }

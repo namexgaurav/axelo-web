@@ -1,216 +1,192 @@
 <script lang="ts">
-  import { cart } from '$lib/stores/cart';
-  import { page } from '$app/state';
-  import { user } from '$lib/auth/auth.store';
-  import { Star, Shield, ArrowRight, Check, CheckCircle2, ChevronRight, Truck, RotateCcw } from 'lucide-svelte';
+  import { Check, ChevronRight } from 'lucide-svelte';
+  import SeoHead from '$lib/components/common/SeoHead.svelte';
+  import ProductGallery from '$lib/components/products/ProductGallery.svelte';
+  import AmazonBuyButton from '$lib/components/products/AmazonBuyButton.svelte';
+  import ProductCard from '$lib/components/products/ProductCard.svelte';
+  import { buildCanonicalUrl, buildProductJsonLd } from '$lib/utils/seo';
+  import { formatProductPrice } from '$lib/utils/format';
 
   export let data;
 
   $: product = data.product;
-  $: supabase = page.data.supabase;
+  $: relatedProducts = data.relatedProducts;
 
-  let selectedColorIdx = 0;
-  let activeImageIdx = 0;
-  let added = false;
+  let selectedVariantIdx = 0;
 
-  $: activeColor = product.colors[selectedColorIdx] || product.colors[0];
-
-  $: galleryImages = [
-    activeColor?.image || product.primaryImage,
-    product.secondaryImage,
-    ...(product.colors.map(c => c.image).filter(img => img !== product.primaryImage && img !== product.secondaryImage))
-  ].filter(Boolean);
-
-  function handleAddToCart() {
-    const color = activeColor?.name || 'Standard';
-    cart.addItem(product, color, supabase, $user?.id);
-    added = true;
-    setTimeout(() => (added = false), 1500);
+  $: if (product?.id) {
+    selectedVariantIdx = 0;
   }
+
+  $: selectedVariant = product.variants[selectedVariantIdx] || null;
+  $: formattedPrice = formatProductPrice(product.price, product.currency);
+  $: summaryText = product.shortDescription || product.tagline || '';
+
+  $: canonicalUrl = buildCanonicalUrl(data.origin, `/products/${product.slug}`);
+  $: seo = {
+    title: product.seoTitle || `${product.name} | AXELO`,
+    description:
+      product.seoDescription ||
+      summaryText ||
+      product.description ||
+      `${product.name} by ${product.brandName}`,
+    canonicalUrl,
+    ogType: 'product' as const,
+    ogImage: product.seoOgImage || product.primaryImage?.url || null
+  };
+  $: jsonLd = buildProductJsonLd(product, canonicalUrl);
 </script>
 
-<svelte:head>
-  <title>{product.name} | AXELO Hardware</title>
-  <meta name="description" content={product.tagline || product.description} />
-</svelte:head>
+<SeoHead {seo} {jsonLd} />
 
-<section class="min-h-screen pt-28 pb-20 px-5 sm:px-8 bg-white">
-  <div class="max-w-7xl mx-auto">
-    
+<section class="min-h-screen pt-28 pb-24 bg-white">
+  <div class="max-w-7xl mx-auto px-5 sm:px-8">
     <!-- Breadcrumb -->
-    <nav class="flex items-center gap-2 text-xs font-mono text-axelo-muted mb-8 uppercase tracking-wider">
-      <a href="/" class="hover:text-axelo-dark transition-colors">Studio</a>
-      <ChevronRight class="w-3 h-3 text-axelo-border" />
-      <a href="/products" class="hover:text-axelo-dark transition-colors">Hardware</a>
-      <ChevronRight class="w-3 h-3 text-axelo-border" />
-      <span class="text-axelo-dark font-medium">{product.categoryLabel}</span>
+    <nav class="flex flex-wrap items-center gap-2 text-xs font-mono text-axelo-muted mb-8" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-axelo-dark transition-colors">Home</a>
+      <ChevronRight class="w-3.5 h-3.5 text-axelo-silver" />
+      <a href="/products" class="hover:text-axelo-dark transition-colors">Products</a>
+      {#if product.categoryName && product.categorySlug}
+        <ChevronRight class="w-3.5 h-3.5 text-axelo-silver" />
+        <a
+          href="/products?category={encodeURIComponent(product.categorySlug)}"
+          class="hover:text-axelo-dark transition-colors"
+        >
+          {product.categoryName}
+        </a>
+      {/if}
+      <ChevronRight class="w-3.5 h-3.5 text-axelo-silver" />
+      <span class="text-axelo-dark font-medium truncate">{product.name}</span>
     </nav>
 
-    <!-- Product Layout Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
-      
-      <!-- Left Column: Gallery (7 Cols) -->
-      <div class="lg:col-span-7 space-y-4">
-        <!-- Main Stage Image -->
-        <div class="aspect-[4/3] bg-axelo-neutral rounded-2xl overflow-hidden border border-axelo-border relative">
-          <img
-            src={galleryImages[activeImageIdx] || product.primaryImage}
-            alt={product.name}
-            class="w-full h-full object-cover transition-all duration-300"
-          />
-          {#if product.badge}
-            <div class="absolute top-4 left-4 bg-axelo-dark text-white px-3 py-1 rounded-md text-[11px] font-mono font-semibold uppercase tracking-wider shadow-sm">
-              {product.badge}
-            </div>
-          {/if}
-        </div>
-
-        <!-- Thumbnails Strip -->
-        {#if galleryImages.length > 1}
-          <div class="flex gap-3 overflow-x-auto pb-2">
-            {#each galleryImages as img, idx}
-              <button
-                type="button"
-                on:click={() => (activeImageIdx = idx)}
-                class="w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 {activeImageIdx === idx ? 'border-axelo-blue shadow-xs' : 'border-axelo-border hover:border-axelo-dark/50'}"
-              >
-                <img src={img} alt="Thumbnail {idx + 1}" class="w-full h-full object-cover" />
-              </button>
-            {/each}
-          </div>
-        {/if}
+    <!-- Main Product Showcase Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+      <!-- Left: Product Gallery -->
+      <div class="lg:col-span-7">
+        <ProductGallery
+          images={product.images}
+          productName={product.name}
+          badge={product.badge}
+          selectedOverrideUrl={selectedVariant?.imageUrl || null}
+        />
       </div>
 
-      <!-- Right Column: Purchasing & Details (5 Cols) -->
-      <div class="lg:col-span-5 flex flex-col justify-start space-y-6">
-        <div>
-          <span class="eyebrow-text text-axelo-blue font-mono">{product.categoryLabel}</span>
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-axelo-dark uppercase mt-1 leading-tight">
+      <!-- Right: Details & Amazon CTA -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2.5">
+            {#if product.categoryName}
+              <span class="eyebrow-text font-mono text-axelo-blue">{product.categoryName}</span>
+            {:else}
+              <span class="eyebrow-text font-mono text-axelo-blue">{product.brandName}</span>
+            {/if}
+            {#if product.sku}
+              <span class="text-axelo-silver">•</span>
+              <span class="font-mono text-[11px] text-axelo-muted">{product.sku}</span>
+            {/if}
+          </div>
+
+          <h1 class="editorial-title text-3xl sm:text-4xl font-extrabold text-axelo-dark">
             {product.name}
           </h1>
-          <p class="text-xs sm:text-sm text-axelo-muted leading-relaxed mt-2">
-            {product.tagline}
-          </p>
 
-          <!-- Rating -->
-          <div class="flex items-center gap-2 mt-3 text-xs font-mono">
-            <div class="flex items-center text-amber-500">
-              {#each Array(5) as _, i}
-                <Star class="w-3.5 h-3.5 {i < Math.floor(product.rating) ? 'fill-current' : 'text-axelo-border'}" />
-              {/each}
-            </div>
-            <span class="font-bold text-axelo-dark">{product.rating}</span>
-            <span class="text-axelo-muted">({product.ratingCount} reviews)</span>
-          </div>
-        </div>
-
-        <!-- Price -->
-        <div class="flex items-baseline gap-3 pb-6 border-b border-axelo-border">
-          <span class="text-3xl font-bold text-axelo-dark font-mono">${product.price}</span>
-          {#if product.originalPrice}
-            <span class="text-base text-axelo-muted line-through font-mono">${product.originalPrice}</span>
-            <span class="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-              Save ${product.originalPrice - product.price}
-            </span>
+          {#if summaryText}
+            <p class="text-sm sm:text-base text-axelo-muted leading-relaxed">
+              {summaryText}
+            </p>
           {/if}
         </div>
 
-        <!-- Color / Finish Selector -->
-        {#if product.colors.length > 0}
-          <div class="space-y-3">
+        <!-- Price (Only when populated in DB) -->
+        {#if formattedPrice}
+          <div class="pb-5 border-b border-axelo-border">
+            <span class="font-mono text-2xl font-bold text-axelo-dark">{formattedPrice}</span>
+          </div>
+        {/if}
+
+        <!-- Variant Selector (Finishes if present in DB) -->
+        {#if product.variants.length > 0}
+          <div class="space-y-3 pb-2">
             <div class="flex items-center justify-between text-xs">
-              <span class="font-mono uppercase text-axelo-muted tracking-wider">Finish: <strong class="text-axelo-dark">{activeColor.name}</strong></span>
-              <span class="font-mono text-[11px] text-axelo-muted">Precision Coated</span>
+              <span class="font-mono uppercase tracking-wider text-axelo-muted">
+                Option: <strong class="text-axelo-dark">{selectedVariant?.name}</strong>
+              </span>
             </div>
-            <div class="flex gap-2.5">
-              {#each product.colors as col, idx}
+            <div class="flex flex-wrap items-center gap-2.5">
+              {#each product.variants as variant, idx (variant.id)}
                 <button
                   type="button"
-                  on:click={() => { selectedColorIdx = idx; activeImageIdx = 0; }}
-                  class="w-8 h-8 rounded-full border-2 transition-transform relative flex items-center justify-center {selectedColorIdx === idx ? 'border-axelo-blue scale-110 shadow-sm' : 'border-axelo-border hover:scale-105'}"
-                  style="background-color: {col.hex}"
-                  title={col.name}
+                  on:click={() => (selectedVariantIdx = idx)}
+                  aria-label="Select finish {variant.name}"
+                  aria-pressed={selectedVariantIdx === idx}
+                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all {selectedVariantIdx === idx
+                    ? 'border-axelo-dark bg-axelo-offwhite text-axelo-dark'
+                    : 'border-axelo-border text-axelo-muted hover:border-axelo-dark/50'}"
                 >
-                  {#if selectedColorIdx === idx}
-                    <div class="w-2 h-2 rounded-full {col.hex === '#FFFFFF' || col.hex === '#EBEBEB' ? 'bg-black' : 'bg-white'}"></div>
+                  {#if variant.colorHex}
+                    <span
+                      class="w-3.5 h-3.5 rounded-full border border-black/10"
+                      style="background-color: {variant.colorHex}"
+                    ></span>
                   {/if}
+                  <span>{variant.name}</span>
                 </button>
               {/each}
             </div>
           </div>
         {/if}
 
-        <!-- Description Paragraph -->
-        <p class="text-xs text-axelo-muted leading-relaxed font-sans">
-          {product.description}
-        </p>
-
-        <!-- Add to Bag CTA -->
-        <div class="pt-2">
-          <button
-            type="button"
-            on:click={handleAddToCart}
-            class="w-full py-4 px-6 rounded-xl bg-axelo-dark hover:bg-black text-white text-xs font-mono uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-2 group shadow-md"
-          >
-            {#if added}
-              <CheckCircle2 class="w-4 h-4 text-emerald-400" />
-              <span>Added to Studio Bag</span>
-            {:else}
-              <span>Add to Studio Bag — ${product.price}</span>
-              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            {/if}
-          </button>
-          <p class="text-center text-[11px] text-axelo-muted mt-2 font-mono">
-            Complimentary shipping over $100 • 30-Day Setup Trial
-          </p>
-        </div>
-
-        <!-- Trust Badges -->
-        <div class="grid grid-cols-3 gap-3 pt-4 border-t border-axelo-border text-center text-xs font-mono">
-          <div class="p-3 rounded-lg bg-axelo-neutral/60 border border-axelo-border/70">
-            <Truck class="w-4 h-4 mx-auto mb-1 text-axelo-dark" />
-            <span class="block text-[10px] text-axelo-muted uppercase">Fast Track</span>
-            <span class="text-axelo-dark font-semibold text-[11px]">Dispatch in 24h</span>
-          </div>
-          <div class="p-3 rounded-lg bg-axelo-neutral/60 border border-axelo-border/70">
-            <Shield class="w-4 h-4 mx-auto mb-1 text-axelo-dark" />
-            <span class="block text-[10px] text-axelo-muted uppercase">Warranty</span>
-            <span class="text-axelo-dark font-semibold text-[11px]">2-Year Studio</span>
-          </div>
-          <div class="p-3 rounded-lg bg-axelo-neutral/60 border border-axelo-border/70">
-            <RotateCcw class="w-4 h-4 mx-auto mb-1 text-axelo-dark" />
-            <span class="block text-[10px] text-axelo-muted uppercase">Trial</span>
-            <span class="text-axelo-dark font-semibold text-[11px]">30-Day Returns</span>
-          </div>
-        </div>
-
-        <!-- Technical Specs Accordion -->
-        {#if product.specs && product.specs.length > 0}
-          <div class="pt-4 border-t border-axelo-border">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-axelo-dark font-bold mb-3">
-              Hardware Specifications
-            </h3>
-            <div class="divide-y divide-axelo-border/60 border-t border-b border-axelo-border/60">
-              {#each product.specs as spec}
-                <div class="py-2.5 flex items-center justify-between text-xs">
-                  <span class="text-axelo-muted font-mono">{spec.label}</span>
-                  <span class="text-axelo-dark font-medium text-right">{spec.value}</span>
-                </div>
-              {/each}
-            </div>
+        <!-- Full Description -->
+        {#if product.description}
+          <div class="text-sm sm:text-base text-axelo-graphite leading-relaxed whitespace-pre-line">
+            {product.description}
           </div>
         {/if}
 
-        <!-- Details Checklist -->
-        {#if product.details && product.details.length > 0}
-          <div class="pt-2">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-axelo-dark font-bold mb-3">
-              Engineering Pillars
-            </h3>
-            <ul class="space-y-2 text-xs text-axelo-muted">
+        <!-- External Amazon Purchase CTA -->
+        <div class="pt-2 space-y-2.5">
+          <AmazonBuyButton
+            amazonUrl={product.amazonUrl}
+            label={product.amazonButtonLabel}
+          />
+          {#if product.amazonUrl}
+            <p class="text-xs text-axelo-muted text-center">
+              Fulfilled externally via Amazon. Opens in a new tab.
+            </p>
+          {/if}
+        </div>
+
+        <!-- Product Highlights (from highlights or details columns) -->
+        {#if product.highlights.length > 0}
+          <div class="pt-6 border-t border-axelo-border space-y-3">
+            <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-axelo-dark">
+              Highlights
+            </h2>
+            <ul class="space-y-2.5">
+              {#each product.highlights as item}
+                <li class="flex items-start gap-2.5 text-sm text-axelo-graphite">
+                  <Check class="w-4 h-4 text-axelo-blue shrink-0 mt-0.5" />
+                  <div>
+                    <span class="font-medium text-axelo-dark">{item.title}</span>
+                    {#if item.description}
+                      <p class="text-xs text-axelo-muted mt-0.5">{item.description}</p>
+                    {/if}
+                  </div>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+
+        {#if product.details.length > 0}
+          <div class="pt-6 border-t border-axelo-border space-y-3">
+            <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-axelo-dark">
+              Key Features
+            </h2>
+            <ul class="space-y-2.5">
               {#each product.details as detail}
-                <li class="flex items-start gap-2">
-                  <Check class="w-3.5 h-3.5 text-axelo-blue shrink-0 mt-0.5" />
+                <li class="flex items-start gap-2.5 text-sm text-axelo-graphite">
+                  <Check class="w-4 h-4 text-axelo-blue shrink-0 mt-0.5" />
                   <span>{detail}</span>
                 </li>
               {/each}
@@ -218,8 +194,49 @@
           </div>
         {/if}
 
+        <!-- Specifications -->
+        {#if product.specs.length > 0}
+          <div class="pt-6 border-t border-axelo-border space-y-3">
+            <h2 class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-axelo-dark">
+              Specifications
+            </h2>
+            <dl class="divide-y divide-axelo-border border-y border-axelo-border">
+              {#each product.specs as spec}
+                <div class="py-3 flex items-baseline justify-between gap-4 text-xs sm:text-sm">
+                  <dt class="font-mono text-axelo-muted shrink-0">{spec.label}</dt>
+                  <dd class="text-axelo-dark font-medium text-right">{spec.value}</dd>
+                </div>
+              {/each}
+            </dl>
+          </div>
+        {/if}
       </div>
     </div>
 
+    <!-- Related Published Products -->
+    {#if relatedProducts.length > 0}
+      <div class="mt-24 pt-16 border-t border-axelo-border">
+        <div class="flex items-end justify-between gap-4 mb-10">
+          <div>
+            <span class="eyebrow-text font-mono text-axelo-blue">Related Hardware</span>
+            <h2 class="editorial-title text-2xl sm:text-3xl font-extrabold text-axelo-dark mt-1">
+              More in {product.categoryName || 'This Collection'}
+            </h2>
+          </div>
+          <a
+            href="/products"
+            class="text-xs font-semibold text-axelo-dark hover:text-axelo-blue transition-colors"
+          >
+            View All →
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {#each relatedProducts as rel (rel.id)}
+            <ProductCard product={rel} />
+          {/each}
+        </div>
+      </div>
+    {/if}
   </div>
 </section>

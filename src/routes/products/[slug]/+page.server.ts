@@ -1,15 +1,16 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { fetchProductBySlug } from '$lib/products/product.service';
+import { getProductDetailBySlug } from '$lib/services/catalog.service';
 
 export const load: PageServerLoad = async ({ params, locals: { supabase } }) => {
-	const product = await fetchProductBySlug(supabase, params.slug);
+	const result = await getProductDetailBySlug(supabase, params.slug);
 
-	if (!product) {
-		throw error(404, `Product "${params.slug}" not found.`);
+	if (!result) {
+		throw error(404, 'Product not found');
 	}
 
 	return {
-		product
+		product: result.product,
+		relatedProducts: result.relatedProducts
 	};
 };

@@ -1,5 +1,5 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
-import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/supabase/types';
 
 declare global {
@@ -9,20 +9,14 @@ declare global {
 			code?: string;
 		}
 		interface Locals {
-			supabase: SupabaseClient<Database, any, any>;
-			safeGetSession: () => Promise<{
-				session: Session | null;
-				user: User | null;
-			}>;
-			session: Session | null;
-			user: User | null;
+			supabase: SupabaseClient<Database>;
 		}
-		interface PageData {
-			session: Session | null;
-			user: User | null;
+		interface Platform {
+			env?: {
+				SUPABASE_SERVICE_ROLE_KEY?: string;
+				[key: string]: unknown;
+			};
 		}
-		// interface PageState {}
-		// interface Platform {}
 	}
 }
 
@@ -31,5 +25,8 @@ declare module '$app/env/public' {
 	export const PUBLIC_SUPABASE_ANON_KEY: string;
 }
 
+declare module '$app/env/private' {
+	export const SUPABASE_SERVICE_ROLE_KEY: string | undefined;
+}
 
 export {};

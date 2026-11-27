@@ -1,12 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { fetchCatalogProducts, fetchCatalogCategories } from '$lib/products/product.service';
+import { listPublishedProducts } from '$lib/services/catalog.service';
 
 export const load: PageServerLoad = async ({ locals: { supabase }, url }) => {
-	const categoryParam = url.searchParams.get('category') || 'all';
-	const [products, categories] = await Promise.all([
-		fetchCatalogProducts(supabase, categoryParam),
-		fetchCatalogCategories(supabase)
-	]);
+	const categoryParam = url.searchParams.get('category')?.trim() || 'all';
+	const { products, categories } = await listPublishedProducts(supabase, categoryParam);
 
 	return {
 		products,
